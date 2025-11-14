@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Shadow-like Web Desktop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0b0e1a;
+    --panel: #14182b;
+    --panel2: #121527;
+    --border: #262d57;
+    --accent: #6c8cff;
+    --accent2: #59d7ff;
+    --text: #e6e9ff;
+    --muted: #9aa3c7;
+    --danger: #ff6b6b;
+    --ok: #2bd57e;
+  }
+  * { box-sizing: border-box }
+  html, body { height: 100% }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    display: grid; grid-template-rows: auto 1fr auto;
+  }
+  .topbar {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; background: var(--panel); border-bottom:1px solid var(--border);
+  }
+  .badge { width:10px;height:10px;border-radius:50%;background:#ff5f57;box-shadow: 18px 0 0 #febc2e, 36px 0 0 #28c840 }
+  .title { font-weight:600; color: var(--muted) }
+  .actions { margin-left:auto; display:flex; gap:8px }
+  .btn {
+    background: #1c2246; border:1px solid var(--border); color: var(--text);
+    padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600;
+  }
+  .btn.primary { background: var(--accent); border-color: transparent; color:#fff }
+  .btn.ghost { background: transparent; border-color: var(--border); color: var(--muted) }
+  .layout { display:grid; grid-template-columns: 220px 1fr; gap:12px; padding:12px }
+  .sidebar {
+    background: var(--panel2); border:1px solid var(--border); border-radius:14px; padding:10px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .nav-item {
+    display:flex; align-items:center; gap:10px;
+    padding:10px; border-radius:10px; cursor:pointer; color: var(--text);
+    border:1px solid transparent;
+  }
+  .nav-item:hover { background:#101432; border-color: var(--border) }
+  .nav-item.active { background:#0f1330; border-color: var(--border) }
+  .nav-item .dot { width:8px;height:8px;border-radius:50%;background:#2f386f }
+  .content {
+    background: var(--panel2); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+    display:grid; grid-template-rows: auto 1fr;
+  }
+  .contentbar { display:flex; gap:8px; align-items:center; padding:10px; border-bottom:1px solid var(--border); background: var(--panel) }
+  .contentbar h3 { margin:0; font-size:14px; color: var(--muted) }
+  .tabbar { display:flex; gap:8px; flex-wrap:wrap; }
+  .tab {
+    background:#0e1230; border:1px solid var(--border); color: var(--text);
+    padding:8px 10px; border-radius:10px; display:flex; align-items:center; gap:6px;
+  }
+  .tab .close { color: var(--muted); cursor:pointer }
+  .view { padding:12px; overflow:auto }
+  .row { display:grid; grid-template-columns: 1fr auto; gap:8px }
+  input, select, textarea {
+    background:#0d122f; border:1px solid var(--border); color:var(--text);
+    padding:10px 12px; border-radius:10px; outline:none;
+  }
+  input::placeholder, textarea::placeholder { color:#7881ab }
+  .grid { display:grid; gap:10px }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr }
+  .card {
+    border:1px solid var(--border); background:#101432; border-radius:12px; padding:12px;
+  }
+  .card h4 { margin:0 0 8px; font-size:14px; color: var(--muted) }
+  .list { display:grid; gap:8px }
+  .item { display:flex; gap:8px; align-items:center }
+  .item a { color: var(--accent2); text-decoration:none }
+  .note { color: var(--muted); font-size:12px }
+  .footer {
+    padding:8px 12px; color:var(--muted); border-top:1px solid var(--border); background: var(--panel);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .status { color: var(--muted) }
+  .ok { color: var(--ok) }
+  .danger { color: var(--danger) }
+  iframe.embedded {
+    width:100%; height:60vh; border:none; background:#0a0f2a; border-radius:10px;
+  }
+  .split { display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+  .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#0a0e25; border:1px solid var(--border); padding:2px 6px; border-radius:6px }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr }
+    .split { grid-template-columns: 1fr }
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="badge" aria-hidden="true"></div>
+    <div class="title">Shadow-like Desktop</div>
+    <div class="actions">
+      <button class="btn" id="fullscreenBtn">Fullscreen</button>
+      <button class="btn ghost" id="aboutBlankBtn">Open about:blank</button>
+      <button class="btn primary" id="newTabBtn">New tab</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="nav-item active" data-view="browser"><div class="dot"></div>Browser</div>
+      <div class="nav-item" data-view="bookmarks"><div class="dot"></div>Bookmarks</div>
+      <div class="nav-item" data-view="settings"><div class="dot"></div>Settings</div>
+      <div class="nav-item" data-view="games"><div class="dot"></div>Games</div>
+      <div class="nav-item" data-view="ai"><div class="dot"></div>AI</div>
+      <div class="nav-item" data-view="chat"><div class="dot"></div>Chat</div>
+      <div class="nav-item" data-view="devtools"><div class="dot"></div>Devtools</div>
+      <div class="nav-item" data-view="discord"><div class="dot"></div>Discord</div>
+      <div class="nav-item" data-view="about"><div class="dot"></div>About</div>
+    </nav>
+
+    <section class="content">
+      <div class="contentbar">
+        <h3 id="viewTitle">Browser</h3>
+        <div class="tabbar" id="tabbar"></div>
+      </div>
+      <div class="view" id="view">
+        <!-- Views are injected by JS -->
+      </div>
+    </section>
+  </div>
+
+  <div class="footer">
+    <div class="status" id="status">Ready</div>
+    <div>Quiet • Fast • Hidden</div>
+  </div>
+
+<script>
+/* State */
+const state = {
+  currentView: "browser",
+  tabs: [], // { id, title, url }
+  provider: localStorage.getItem("provider") || "duckduckgo",
+  bookmarks: JSON.parse(localStorage.getItem("bookmarks") || "[]"), // {title, url}
+  history: JSON.parse(localStorage.getItem("history") || "[]"), // { title, url, ts }
+};
+
+/* Utils */
+const el = (sel) => document.querySelector(sel);
+function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])); }
+function setStatus(msg) { el("#status").textContent = msg; }
+function save() {
+  localStorage.setItem("provider", state.provider);
+  localStorage.setItem("bookmarks", JSON.stringify(state.bookmarks));
+  localStorage.setItem("history", JSON.stringify(state.history));
+}
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+/* Navigation */
+document.querySelectorAll(".nav-item").forEach(item => {
+  item.addEventListener("click", () => {
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    item.classList.add("active");
+    state.currentView = item.dataset.view;
+    renderView();
+  });
+});
+
+/* Top actions */
+el("#fullscreenBtn").addEventListener("click", () => {
+  const doc = document.documentElement;
+  if (!document.fullscreenElement) doc.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen().catch(()=>{});
+});
+el("#aboutBlankBtn").addEventListener("click", () => {
+  const w = window.open("about:blank", "_blank");
+  if (w) {
+    const html = `<!doctype html><title>Hidden</title><style>body{margin:0;background:#000;color:#0f0;font:16px monospace}</style><p>about:blank shell</p>`;
+    w.document.write(html);
+    w.document.close();
+    setStatus("about:blank opened");
+  } else {
+    setStatus("Popup blocked");
+  }
+});
+el("#newTabBtn").addEventListener("click", () => newTab("New tab", "")); // opens blank tab
+
+/* Tabs */
+function newTab(title, url) {
+  const id = uid();
+  state.tabs.push({ id, title: title || "New tab", url: url || "" });
+  renderTabs();
+  renderView(); // ensure browser view shows tab area
+  setStatus("Tab created");
+}
+function closeTab(id) {
+  state.tabs = state.tabs.filter(t => t.id !== id);
+  renderTabs();
+  setStatus("Tab closed");
+}
+function renderTabs() {
+  const t = state.tabs.map(tab => `
+    <div class="tab">
+      <span>${escapeHtml(tab.title)}</span>
+      <span class="close" data-id="${tab.id}">×</span>
+    </div>
+  `).join("");
+  el("#tabbar").innerHTML = t || `<div class="tab"><span>No tabs</span></div>`;
+  el("#tabbar").querySelectorAll(".close").forEach(x => x.addEventListener("click", () => closeTab(x.dataset.id)));
+}
+
+/* Views */
+function renderView() {
+  el("#viewTitle").textContent = {
+    browser: "Browser",
+    bookmarks: "Bookmarks",
+    settings: "Settings",
+    games: "Games",
+    ai: "AI",
+    chat: "Chat",
+    devtools: "Devtools",
+    discord: "Discord",
+    about: "About",
+  }[state.currentView] || "App";
+
+  const v = el("#view");
+  v.innerHTML = "";
+  if (state.currentView === "browser") renderBrowser(v);
+  else if (state.currentView === "bookmarks") renderBookmarks(v);
+  else if (state.currentView === "settings") renderSettings(v);
+  else if (state.currentView === "games") renderGames(v);
+  else if (state.currentView === "ai") renderAI(v);
+  else if (state.currentView === "chat") renderChat(v);
+  else if (state.currentView === "devtools") renderDevtools(v);
+  else if (state.currentView === "discord") renderDiscord(v);
+  else if (state.currentView === "about") renderAbout(v);
+}
+
+/* Browser view */
+function renderBrowser(v) {
+  v.innerHTML = `
+    <div class="card">
+      <h4>Search</h4>
+      <div class="row">
+        <input id="q" type="search" placeholder="Search the web…" />
+        <button class="btn primary" id="goBtn">Go</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <select id="provider">
+          <option value="duckduckgo"${state.provider==="duckduckgo"?" selected":""}>DuckDuckGo</option>
+          <option value="google"${state.provider==="google"?" selected":""}>Google</option>
+          <option value="bing"${state.provider==="bing"?" selected":""}>Bing</option>
+        </select>
+        <button class="btn" id="newTabFromSearch">Open in tab</button>
+      </div>
+      <div id="searchResults" class="grid" style="margin-top:10px"></div>
+      <div class="note">Uses your server proxy endpoint /search?q=&provider=. Configure backend keys for Google/Bing.</div>
+    </div>
+
+    <div class="split" style="margin-top:12px">
+      <div class="card">
+        <h4>Mini browser</h4>
+        <div class="row">
+          <input id="urlInput" type="url" placeholder="https://example.com" />
+          <button class="btn" id="openUrlBtn">Open</button>
+        </div>
+        <iframe class="embedded" id="webFrame" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="bookmarkBtn">Bookmark current</button>
+          <button class="btn ghost" id="clearFrameBtn">Clear</button>
+        </div>
+      </div>
+      <div class="card">
+        <h4>History</h4>
+        <div class="list" id="historyList"></div>
+      </div>
+    </div>
+  `;
+  el("#provider").addEventListener("change", ev => { state.provider = ev.target.value; save(); });
+  el("#goBtn").addEventListener("click", doSearch);
+  el("#newTabFromSearch").addEventListener("click", () => {
+    const q = el("#q").value.trim();
+    if (!q) return;
+    newTab(q, `search:${state.provider}:${q}`);
+  });
+  el("#openUrlBtn").addEventListener("click", () => {
+    const u = el("#urlInput").value.trim();
+    if (!u) return;
+    try {
+      const url = u.match(/^https?:\/\//) ? u : `https://${u}`;
+      el("#webFrame").src = url;
+      const title = url.replace(/^https?:\/\//, "");
+      state.history.unshift({ title, url, ts: Date.now() });
+      state.history = state.history.slice(0, 50);
+      save();
+      renderHistory();
+    } catch { setStatus("Invalid URL"); }
+  });
+  el("#bookmarkBtn").addEventListener("click", () => {
+    const url = el("#webFrame").src;
+    if (!url) return;
+    state.bookmarks.unshift({ title: url, url });
+    state.bookmarks = state.bookmarks.slice(0, 100);
+    save();
+    setStatus("Bookmarked");
+  });
+  el("#clearFrameBtn").addEventListener("click", () => { el("#webFrame").src = ""; });
+
+  renderHistory();
+}
+
+/* Search via proxy */
+async function doSearch() {
+  const q = el("#q").value.trim();
+  if (!q) return;
+  setStatus(`Searching ${state.provider}…`);
+  const box = el("#searchResults");
+  box.innerHTML = `<div class="note">Searching…</div>`;
+  try {
+    const r = await fetch(`/search?q=${encodeURIComponent(q)}&provider=${state.provider}`);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Request failed");
+    const normalized = normalizeResults(state.provider, data);
+    box.innerHTML = normalized.items.map(it => `
+      <div class="card">
+        <div class="item">
+          <a href="${it.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(it.title)}</a>
+        </div>
+        <div class="note">${escapeHtml(it.snippet || "")}</div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" data-url="${it.url}" data-title="${escapeHtml(it.title)}">Open</button>
+          <button class="btn ghost bookmark" data-url="${it.url}" data-title="${escapeHtml(it.title)}">Bookmark</button>
+        </div>
+      </div>
+    `).join("");
+    box.querySelectorAll(".btn[data-url]").forEach(b => b.addEventListener("click", () => {
+      el("#urlInput").value = b.dataset.url;
+      el("#openUrlBtn").click();
+    }));
+    box.querySelectorAll(".bookmark").forEach(b => b.addEventListener("click", () => {
+      state.bookmarks.unshift({ title: b.dataset.title, url: b.dataset.url });
+      state.bookmarks = state.bookmarks.slice(0, 100);
+      save();
+      setStatus("Bookmarked from results");
+    }));
+  } catch (e) {
+    box.innerHTML = `<div class="card"><div class="danger">Error: ${escapeHtml(e.message)}</div></div>`;
+  }
+}
+
+/* Normalize results across providers */
+function normalizeResults(provider, res) {
+  // res = { provider, data } from proxy
+  const items = [];
+  if (provider === "duckduckgo") {
+    const d = res.data || {};
+    const primary = d.Heading ? [{ title: d.Heading, snippet: d.Abstract, url: d.AbstractURL || "#" }] : [];
+    const related = (d.RelatedTopics || [])
+      .flatMap(rt => rt.Topics ? rt.Topics : [rt])
+      .filter(t => t && t.Text && t.FirstURL)
+      .map(t => ({ title: t.Text, snippet: "", url: t.FirstURL }));
+    return { items: [...primary, ...related].slice(0, 10) };
+  }
+  if (provider === "google") {
+    const itemsRaw = (res.data && res.data.items) || [];
+    return { items: itemsRaw.map(it => ({ title: it.title, snippet: it.snippet, url: it.link })) };
+  }
+  if (provider === "bing") {
+    const webPages = res.data && res.data.webPages && res.data.webPages.value || [];
+    return { items: webPages.map(it => ({ title: it.name, snippet: it.snippet, url: it.url })) };
+  }
+  return { items };
+}
+
+/* Bookmarks */
+function renderBookmarks(v) {
+  v.innerHTML = `
+    <div class="card">
+      <h4>Bookmarks</h4>
+      <div class="list" id="bmList"></div>
+      <div class="row" style="margin-top:10px">
+        <input id="bmTitle" placeholder="Title" />
+        <input id="bmUrl" placeholder="https://…" />
+        <button class="btn" id="bmAdd">Add</button>
+      </div>
+    </div>
+  `;
+  const list = el("#bmList");
+  function draw() {
+    list.innerHTML = state.bookmarks.length ? state.bookmarks.map((b, i) => `
+      <div class="item">
+        <a href="${b.url}" target="_blank">${escapeHtml(b.title)}</a>
+        <button class="btn ghost" data-i="${i}">Remove</button>
+      </div>
+    `).join("") : `<div class="note">No bookmarks yet.</div>`;
+    list.querySelectorAll("button[data-i]").forEach(btn => btn.addEventListener("click", () => {
+      state.bookmarks.splice(Number(btn.dataset.i), 1);
+      save(); draw();
+    }));
+  }
+  draw();
+  el("#bmAdd").addEventListener("click", () => {
+    const t = el("#bmTitle").value.trim();
+    const u = el("#bmUrl").value.trim();
+    if (!u) return;
+    state.bookmarks.unshift({ title: t || u, url: u });
+    save(); draw();
+    el("#bmTitle").value = ""; el("#bmUrl").value = "";
+  });
+}
+
+/* Settings */
+function renderSettings(v) {
+  v.innerHTML = `
+    <div class="grid cols-2">
+      <div class="card">
+        <h4>Search provider</h4>
+        <select id="providerSetting">
+          <option value="duckduckgo"${state.provider==="duckduckgo"?" selected":""}>DuckDuckGo</option>
+          <option value="google"${state.provider==="google"?" selected":""}>Google</option>
+          <option value="bing"${state.provider==="bing"?" selected":""}>Bing</option>
+        </select>
+        <p class="note">Proxy endpoint: <span class="kbd">/search?q=&provider=</span></p>
+      </div>
+      <div class="card">
+        <h4>Privacy</h4>
+        <label><input type="checkbox" id="storeHistory"> Store local history</label>
+        <p class="note">History is saved in your browser’s localStorage. No server storage.</p>
+      </div>
+      <div class="card">
+        <h4>Appearance</h4>
+        <label><input type="checkbox" id="highContrast"> High contrast mode</label>
+      </div>
+      <div class="card">
+        <h4>System</h4>
+        <button class="btn danger" id="resetBtn">Reset local data</button>
+      </div>
+    </div>
+  `;
+  el("#providerSetting").addEventListener("change", e => { state.provider = e.target.value; save(); setStatus("Provider updated"); });
+  el("#storeHistory").checked = !!localStorage.getItem("history");
+  el("#storeHistory").addEventListener("change", e => {
+    if (!e.target.checked) { localStorage.removeItem("history"); state.history = []; }
+    else save();
+  });
+  el("#highContrast").addEventListener("change", e => {
+    document.body.style.filter = e.target.checked ? "contrast(1.2) saturate(1.1)" : "";
+  });
+  el("#resetBtn").addEventListener("click", () => {
+    if (!confirm("Reset bookmarks, history, provider?")) return;
+    localStorage.clear();
+    state.provider = "duckduckgo";
+    state.bookmarks = []; state.history = [];
+    renderView(); setStatus("Reset complete");
+  });
+}
+
+/* Games (Flappy Bird) */
+function renderGames(v) {
+  v.innerHTML = `
+    <div class="card">
+      <h4>Flappy Bird</h4>
+      <canvas id="flappy" width="360" height="480" style="background:#0a0e25;border:1px solid var(--border);border-radius:10px"></canvas>
+      <p class="note">Space or click to flap. Simple canvas implementation.</p>
+    </div>
+  `;
+  flappyInit(el("#flappy"));
+}
+function flappyInit(canvas) {
+  const ctx = canvas.getContext("2d");
+  let birdY = 200, vel = 0, pipes = [], score = 0, alive = true;
+  function reset() { birdY = 200; vel = 0; pipes = []; score = 0; alive = true; }
+  function pipe() {
+    const gap = 110, top = Math.random() * 240 + 40;
+    pipes.push({ x: canvas.width, top, gap });
+  }
+  function step() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // gravity
+    vel += 0.5; birdY += vel;
+    // bird
+    ctx.fillStyle = "#ffd166"; ctx.fillRect(40, birdY, 24, 24);
+    if (birdY < 0 || birdY > canvas.height - 24) alive = false;
+    // pipes
+    if (!pipes.length || pipes[pipes.length-1].x < canvas.width - 180) pipe();
+    ctx.fillStyle = "#59d7ff";
+    for (const p of pipes) {
+      p.x -= 2.2;
+      ctx.fillRect(p.x, 0, 44, p.top);
+      ctx.fillRect(p.x, p.top + p.gap, 44, canvas.height - (p.top + p.gap));
+      // collision
+      const inX = 40+24 > p.x && 40 < p.x+44;
+      const hitTop = birdY < p.top;
+      const hitBottom = birdY+24 > p.top + p.gap;
+      if (inX && (hitTop || hitBottom)) alive = false;
+      if (p.x+44 === 40) score++;
+    }
+    // score
+    ctx.fillStyle = "#e6e9ff"; ctx.font = "16px monospace";
+    ctx.fillText(`Score: ${score}`, 12, 22);
+    if (!alive) {
+      ctx.fillStyle = "#ff6b6b"; ctx.fillText("Game Over (R to restart)", 12, 42);
+      return;
+    }
+    requestAnimationFrame(step);
+  }
+  function flap() { if (!alive) return; vel = -6.8; }
+  canvas.addEventListener("mousedown", flap);
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space") flap();
+    if (e.code === "KeyR") { reset(); step(); }
+  });
+  reset(); step();
+}
+
+/* AI (placeholder) */
+function renderAI(v) {
+  v.innerHTML = `
+    <div class="card">
+      <h4>AI assistant</h4>
+      <div class="row">
+        <input id="aiPrompt" placeholder="Ask something…" />
+        <button class="btn primary" id="aiSend">Send</button>
+      </div>
+      <div class="card" style="margin-top:10px"><div id="aiOut" class="list"></div></div>
+      <p class="note">Wire this to your AI backend. Currently echoes and keeps local history.</p>
+    </div>
+  `;
+  const out = el("#aiOut");
+  el("#aiSend").addEventListener("click", () => {
+    const q = el("#aiPrompt").value.trim(); if (!q) return;
+    const a = `You asked: "${q}". This is a placeholder response.`;
+    out.innerHTML = `<div class="item"><span class="kbd">You</span>: ${escapeHtml(q)}</div>
+                     <div class="item"><span class="kbd">AI</span>: ${escapeHtml(a)}</div>` + out.innerHTML;
+    el("#aiPrompt").value = "";
+  });
+}
+
+/* Chat (local mock) */
+function renderChat(v) {
+  v.innerHTML = `
+    <div class="card">
+      <h4>Chat (local)</h4>
+      <div id="chatLog" class="list"></div>
+      <div class="row" style="margin-top:10px">
+        <input id="chatMsg" placeholder="Type a message…" />
+        <button class="btn" id="chatSend">Send</button>
+      </div>
+      <p class="note">For real-time chat, connect to a WebSocket backend.</p>
+    </div>
+  `;
+  const log = el("#chatLog");
+  el("#chatSend").addEventListener("click", () => {
+    const m = el("#chatMsg").value.trim(); if (!m) return;
+    log.innerHTML += `<div class="item"><span class="kbd">You</span>: ${escapeHtml(m)}</div>`;
+    el("#chatMsg").value = "";
+  });
+}
+
+/* Devtools */
+function renderDevtools(v) {
+  v.innerHTML = `
+    <div class="grid cols-2">
+      <div class="card">
+        <h4>Console</h4>
+        <textarea id="jsInput" rows="8" placeholder="console.log('hello')"></textarea>
+        <button class="btn" id="runJS">Run</button>
+        <pre id="jsOut" class="kbd" style="margin-top:8px; white-space:pre-wrap"></pre>
+      </div>
+      <div class="card">
+        <h4>Sandbox frame</h4>
+        <iframe class="embedded" id="sandbox" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="loadHtml">Load sample</button>
+          <button class="btn ghost" id="clearHtml">Clear</button>
+        </div>
+      </div>
+    </div>
+  `;
+  el("#runJS").addEventListener("click", () => {
+    const code = el("#jsInput").value;
+    try {
+      // eslint-disable-next-line no-eval
+      const res = eval(code);
+      el("#jsOut").textContent = String(res);
+    } catch (e) {
+      el("#jsOut").textContent = "Error: " + e.message;
+    }
+  });
+  el("#loadHtml").addEventListener("click", () => {
+    const doc = el("#sandbox").contentDocument;
+    doc.open();
+    doc.write(`<!doctype html><meta charset="utf-8"><title>Sandbox</title><style>
+      body{margin:0;background:#000;color:#0f0;font:14px monospace;padding:10px}
+    </style><p>Sandbox loaded.</p><script>console.log('Sandbox ready')</script>`);
+    doc.close();
+  });
+  el("#clearHtml").addEventListener("click", () => { el("#sandbox").srcdoc = ""; });
+}
+
+/* Discord */
+function renderDiscord(v) {
+  v.innerHTML = `
+    <div class="card">
+      <h4>Discord launcher</h4>
+      <div class="row">
+        <input id="discordUrl" placeholder="https://discord.com/invite/yourcode" />
+        <button class="btn" id="discordOpen">Open</button>
+      </div>
+      <p class="note">Opens in a new tab. You can embed with an iframe, but most features require full page.</p>
+    </div>
+  `;
+  el("#discordOpen").addEventListener("click", () => {
+    const u = el("#discordUrl").value.trim();
+    if (!u) return;
+    window.open(u.match(/^https?:\/\//) ? u : "https://" + u, "_blank");
+  });
+}
+
+/* About */
+function renderAbout(v) {
+  v.innerHTML = `
+    <div class="card">
+      <h4>About</h4>
+      <p>Shadow-like multi-app interface. Tabs, provider-switchable search, bookmarks, games, AI, chat, devtools, fullscreen, about:blank.</p>
+      <p class="note">For the search proxy, implement /search on your server (Node/Express recommended) with DuckDuckGo, Google, Bing routing.</p>
+    </div>
+  `;
+}
+
+/* History drawer */
+function renderHistory() {
+  const list = el("#historyList");
+  if (!list) return;
+  list.innerHTML = state.history.length ? state.history.map(h => `
+    <div class="item">
+      <a href="${h.url}" target="_blank">${escapeHtml(h.title)}</a>
+      <span class="note">${new Date(h.ts).toLocaleString()}</span>
+    </div>
+  `).join("") : `<div class="note">No history yet.</div>`;
+}
+
+/* Boot */
+renderTabs();
+renderView();
+</script>
+</body>
+</html>
