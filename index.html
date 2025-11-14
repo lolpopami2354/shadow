@@ -6,95 +6,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root {
-    --bg: #0b0e1a;
-    --panel: #14182b;
-    --panel2: #121527;
-    --border: #262d57;
-    --accent: #6c8cff;
-    --accent2: #59d7ff;
-    --text: #e6e9ff;
-    --muted: #9aa3c7;
-    --danger: #ff6b6b;
-    --ok: #2bd57e;
+    --bg: #0b0e1a; --panel: #14182b; --panel2: #121527; --border: #262d57;
+    --accent: #6c8cff; --accent2: #59d7ff; --text: #e6e9ff; --muted: #9aa3c7;
+    --danger: #ff6b6b; --ok: #2bd57e;
   }
   * { box-sizing: border-box }
   html, body { height: 100% }
-  body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    display: grid; grid-template-rows: auto 1fr auto;
-  }
-  .topbar {
-    display:flex; align-items:center; gap:10px;
-    padding:10px 12px; background: var(--panel); border-bottom:1px solid var(--border);
-  }
-  .badge { width:10px;height:10px;border-radius:50%;background:#ff5f57;box-shadow: 18px 0 0 #febc2e, 36px 0 0 #28c840 }
-  .title { font-weight:600; color: var(--muted) }
+  body { margin:0; background:var(--bg); color:var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+         display:grid; grid-template-rows: auto 1fr auto; }
+  .topbar { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--panel); border-bottom:1px solid var(--border) }
+  .badge { width:10px;height:10px;border-radius:50%;background:#ff5f57;box-shadow:18px 0 0 #febc2e,36px 0 0 #28c840 }
+  .title { font-weight:600; color:var(--muted) }
   .actions { margin-left:auto; display:flex; gap:8px }
-  .btn {
-    background: #1c2246; border:1px solid var(--border); color: var(--text);
-    padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600;
-  }
-  .btn.primary { background: var(--accent); border-color: transparent; color:#fff }
-  .btn.ghost { background: transparent; border-color: var(--border); color: var(--muted) }
+  .btn { background:#1c2246; border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600 }
+  .btn.primary { background:var(--accent); border-color:transparent; color:#fff }
+  .btn.ghost { background:transparent; border-color:var(--border); color:var(--muted) }
   .layout { display:grid; grid-template-columns: 220px 1fr; gap:12px; padding:12px }
-  .sidebar {
-    background: var(--panel2); border:1px solid var(--border); border-radius:14px; padding:10px;
-    display:flex; flex-direction:column; gap:8px;
-  }
-  .nav-item {
-    display:flex; align-items:center; gap:10px;
-    padding:10px; border-radius:10px; cursor:pointer; color: var(--text);
-    border:1px solid transparent;
-  }
-  .nav-item:hover { background:#101432; border-color: var(--border) }
-  .nav-item.active { background:#0f1330; border-color: var(--border) }
+  .sidebar { background:var(--panel2); border:1px solid var(--border); border-radius:14px; padding:10px; display:flex; flex-direction:column; gap:8px }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; cursor:pointer; color:var(--text); border:1px solid transparent }
+  .nav-item:hover { background:#101432; border-color:var(--border) }
+  .nav-item.active { background:#0f1330; border-color:var(--border) }
   .nav-item .dot { width:8px;height:8px;border-radius:50%;background:#2f386f }
-  .content {
-    background: var(--panel2); border:1px solid var(--border); border-radius:14px; overflow:hidden;
-    display:grid; grid-template-rows: auto 1fr;
-  }
-  .contentbar { display:flex; gap:8px; align-items:center; padding:10px; border-bottom:1px solid var(--border); background: var(--panel) }
-  .contentbar h3 { margin:0; font-size:14px; color: var(--muted) }
-  .tabbar { display:flex; gap:8px; flex-wrap:wrap; }
-  .tab {
-    background:#0e1230; border:1px solid var(--border); color: var(--text);
-    padding:8px 10px; border-radius:10px; display:flex; align-items:center; gap:6px;
-  }
-  .tab .close { color: var(--muted); cursor:pointer }
+  .content { background:var(--panel2); border:1px solid var(--border); border-radius:14px; overflow:hidden; display:grid; grid-template-rows: auto 1fr }
+  .contentbar { display:flex; gap:8px; align-items:center; padding:10px; border-bottom:1px solid var(--border); background:var(--panel) }
+  .contentbar h3 { margin:0; font-size:14px; color:var(--muted) }
+  .tabbar { display:flex; gap:8px; flex-wrap:wrap }
+  .tab { background:#0e1230; border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:10px; display:flex; align-items:center; gap:6px }
+  .tab .close { color:var(--muted); cursor:pointer }
   .view { padding:12px; overflow:auto }
   .row { display:grid; grid-template-columns: 1fr auto; gap:8px }
-  input, select, textarea {
-    background:#0d122f; border:1px solid var(--border); color:var(--text);
-    padding:10px 12px; border-radius:10px; outline:none;
-  }
+  input, select, textarea { background:#0d122f; border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:10px; outline:none }
   input::placeholder, textarea::placeholder { color:#7881ab }
   .grid { display:grid; gap:10px }
   .grid.cols-2 { grid-template-columns: 1fr 1fr }
-  .card {
-    border:1px solid var(--border); background:#101432; border-radius:12px; padding:12px;
-  }
-  .card h4 { margin:0 0 8px; font-size:14px; color: var(--muted) }
+  .card { border:1px solid var(--border); background:#101432; border-radius:12px; padding:12px }
+  .card h4 { margin:0 0 8px; font-size:14px; color:var(--muted) }
   .list { display:grid; gap:8px }
   .item { display:flex; gap:8px; align-items:center }
-  .item a { color: var(--accent2); text-decoration:none }
-  .note { color: var(--muted); font-size:12px }
-  .footer {
-    padding:8px 12px; color:var(--muted); border-top:1px solid var(--border); background: var(--panel);
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .status { color: var(--muted) }
-  .ok { color: var(--ok) }
-  .danger { color: var(--danger) }
-  iframe.embedded {
-    width:100%; height:60vh; border:none; background:#0a0f2a; border-radius:10px;
-  }
+  .item a { color:var(--accent2); text-decoration:none }
+  .note { color:var(--muted); font-size:12px }
+  .footer { padding:8px 12px; color:var(--muted); border-top:1px solid var(--border); background:var(--panel); display:flex; justify-content:space-between; align-items:center }
+  .status { color:var(--muted) }
+  .ok { color:var(--ok) } .danger { color:var(--danger) }
+  iframe.embedded { width:100%; height:60vh; border:none; background:#0a0f2a; border-radius:10px }
   .split { display:grid; grid-template-columns: 1fr 1fr; gap:12px }
-  .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#0a0e25; border:1px solid var(--border); padding:2px 6px; border-radius:6px }
-  @media (max-width: 900px) {
-    .layout { grid-template-columns: 1fr }
-    .split { grid-template-columns: 1fr }
-  }
+  .kbd { font-family: ui-monospace, Menlo, Consolas, monospace; background:#0a0e25; border:1px solid var(--border); padding:2px 6px; border-radius:6px }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr } .split { grid-template-columns: 1fr } }
 </style>
 </head>
 <body>
@@ -126,9 +83,7 @@
         <h3 id="viewTitle">Browser</h3>
         <div class="tabbar" id="tabbar"></div>
       </div>
-      <div class="view" id="view">
-        <!-- Views are injected by JS -->
-      </div>
+      <div class="view" id="view"></div>
     </section>
   </div>
 
@@ -143,25 +98,28 @@ const state = {
   currentView: "browser",
   tabs: [], // { id, title, url }
   provider: localStorage.getItem("provider") || "duckduckgo",
-  bookmarks: JSON.parse(localStorage.getItem("bookmarks") || "[]"), // {title, url}
-  history: JSON.parse(localStorage.getItem("history") || "[]"), // { title, url, ts }
+  storageMode: localStorage.getItem("storageMode") || "local", // local | server
+  bookmarks: JSON.parse(localStorage.getItem("bookmarks") || "[]"),
+  history: JSON.parse(localStorage.getItem("history") || "[]"),
 };
 
 /* Utils */
 const el = (sel) => document.querySelector(sel);
+const els = (sel) => document.querySelectorAll(sel);
 function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])); }
 function setStatus(msg) { el("#status").textContent = msg; }
-function save() {
+function saveLocal() {
   localStorage.setItem("provider", state.provider);
+  localStorage.setItem("storageMode", state.storageMode);
   localStorage.setItem("bookmarks", JSON.stringify(state.bookmarks));
   localStorage.setItem("history", JSON.stringify(state.history));
 }
 function uid() { return Math.random().toString(36).slice(2,9); }
 
 /* Navigation */
-document.querySelectorAll(".nav-item").forEach(item => {
+els(".nav-item").forEach(item => {
   item.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    els(".nav-item").forEach(n => n.classList.remove("active"));
     item.classList.add("active");
     state.currentView = item.dataset.view;
     renderView();
@@ -178,27 +136,21 @@ el("#aboutBlankBtn").addEventListener("click", () => {
   const w = window.open("about:blank", "_blank");
   if (w) {
     const html = `<!doctype html><title>Hidden</title><style>body{margin:0;background:#000;color:#0f0;font:16px monospace}</style><p>about:blank shell</p>`;
-    w.document.write(html);
-    w.document.close();
+    w.document.write(html); w.document.close();
     setStatus("about:blank opened");
-  } else {
-    setStatus("Popup blocked");
-  }
+  } else setStatus("Popup blocked");
 });
-el("#newTabBtn").addEventListener("click", () => newTab("New tab", "")); // opens blank tab
+el("#newTabBtn").addEventListener("click", () => newTab("New tab", ""));
 
 /* Tabs */
 function newTab(title, url) {
   const id = uid();
   state.tabs.push({ id, title: title || "New tab", url: url || "" });
-  renderTabs();
-  renderView(); // ensure browser view shows tab area
-  setStatus("Tab created");
+  renderTabs(); renderView(); setStatus("Tab created");
 }
 function closeTab(id) {
   state.tabs = state.tabs.filter(t => t.id !== id);
-  renderTabs();
-  setStatus("Tab closed");
+  renderTabs(); setStatus("Tab closed");
 }
 function renderTabs() {
   const t = state.tabs.map(tab => `
@@ -214,16 +166,9 @@ function renderTabs() {
 /* Views */
 function renderView() {
   el("#viewTitle").textContent = {
-    browser: "Browser",
-    bookmarks: "Bookmarks",
-    settings: "Settings",
-    games: "Games",
-    ai: "AI",
-    chat: "Chat",
-    devtools: "Devtools",
-    discord: "Discord",
-    about: "About",
-  }[state.currentView] || "App";
+    browser: "Browser", bookmarks: "Bookmarks", settings: "Settings", games: "Games",
+    ai: "AI", chat: "Chat", devtools: "Devtools", discord: "Discord", about: "About",
+  }[state.currentView];
 
   const v = el("#view");
   v.innerHTML = "";
@@ -256,7 +201,7 @@ function renderBrowser(v) {
         <button class="btn" id="newTabFromSearch">Open in tab</button>
       </div>
       <div id="searchResults" class="grid" style="margin-top:10px"></div>
-      <div class="note">Uses your server proxy endpoint /search?q=&provider=. Configure backend keys for Google/Bing.</div>
+      <div class="note">Proxy: /search?q=&provider=</div>
     </div>
 
     <div class="split" style="margin-top:12px">
@@ -278,36 +223,30 @@ function renderBrowser(v) {
       </div>
     </div>
   `;
-  el("#provider").addEventListener("change", ev => { state.provider = ev.target.value; save(); });
+  el("#provider").addEventListener("change", ev => { state.provider = ev.target.value; saveLocal(); });
   el("#goBtn").addEventListener("click", doSearch);
   el("#newTabFromSearch").addEventListener("click", () => {
     const q = el("#q").value.trim();
     if (!q) return;
     newTab(q, `search:${state.provider}:${q}`);
   });
-  el("#openUrlBtn").addEventListener("click", () => {
+  el("#openUrlBtn").addEventListener("click", async () => {
     const u = el("#urlInput").value.trim();
     if (!u) return;
-    try {
-      const url = u.match(/^https?:\/\//) ? u : `https://${u}`;
-      el("#webFrame").src = url;
-      const title = url.replace(/^https?:\/\//, "");
-      state.history.unshift({ title, url, ts: Date.now() });
-      state.history = state.history.slice(0, 50);
-      save();
-      renderHistory();
-    } catch { setStatus("Invalid URL"); }
+    const url = u.match(/^https?:\/\//) ? u : `https://${u}`;
+    el("#webFrame").src = url;
+    const title = url.replace(/^https?:\/\//, "");
+    await addHistory({ title, url });
+    renderHistory();
   });
-  el("#bookmarkBtn").addEventListener("click", () => {
+  el("#bookmarkBtn").addEventListener("click", async () => {
     const url = el("#webFrame").src;
     if (!url) return;
-    state.bookmarks.unshift({ title: url, url });
-    state.bookmarks = state.bookmarks.slice(0, 100);
-    save();
+    await addBookmark({ title: url, url });
     setStatus("Bookmarked");
+    renderBookmarksPanelOnly();
   });
   el("#clearFrameBtn").addEventListener("click", () => { el("#webFrame").src = ""; });
-
   renderHistory();
 }
 
@@ -322,8 +261,7 @@ async function doSearch() {
     const r = await fetch(`/search?q=${encodeURIComponent(q)}&provider=${state.provider}`);
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "Request failed");
-    const normalized = normalizeResults(state.provider, data);
-    box.innerHTML = normalized.items.map(it => `
+    box.innerHTML = (data.items || []).map(it => `
       <div class="card">
         <div class="item">
           <a href="${it.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(it.title)}</a>
@@ -335,46 +273,81 @@ async function doSearch() {
         </div>
       </div>
     `).join("");
-    box.querySelectorAll(".btn[data-url]").forEach(b => b.addEventListener("click", () => {
+    box.querySelectorAll(".btn[data-url]").forEach(b => b.addEventListener("click", async () => {
       el("#urlInput").value = b.dataset.url;
       el("#openUrlBtn").click();
+      await addHistory({ title: b.dataset.title, url: b.dataset.url });
+      renderHistory();
     }));
-    box.querySelectorAll(".bookmark").forEach(b => b.addEventListener("click", () => {
-      state.bookmarks.unshift({ title: b.dataset.title, url: b.dataset.url });
-      state.bookmarks = state.bookmarks.slice(0, 100);
-      save();
+    box.querySelectorAll(".bookmark").forEach(b => b.addEventListener("click", async () => {
+      await addBookmark({ title: b.dataset.title, url: b.dataset.url });
       setStatus("Bookmarked from results");
+      renderBookmarksPanelOnly();
     }));
   } catch (e) {
     box.innerHTML = `<div class="card"><div class="danger">Error: ${escapeHtml(e.message)}</div></div>`;
   }
 }
 
-/* Normalize results across providers */
-function normalizeResults(provider, res) {
-  // res = { provider, data } from proxy
-  const items = [];
-  if (provider === "duckduckgo") {
-    const d = res.data || {};
-    const primary = d.Heading ? [{ title: d.Heading, snippet: d.Abstract, url: d.AbstractURL || "#" }] : [];
-    const related = (d.RelatedTopics || [])
-      .flatMap(rt => rt.Topics ? rt.Topics : [rt])
-      .filter(t => t && t.Text && t.FirstURL)
-      .map(t => ({ title: t.Text, snippet: "", url: t.FirstURL }));
-    return { items: [...primary, ...related].slice(0, 10) };
+/* Bookmarks helpers (local or server) */
+async function addBookmark(bm) {
+  if (state.storageMode === "server") {
+    const r = await fetch("/bookmarks", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(bm) });
+    if (!r.ok) throw new Error("Bookmark save failed");
+  } else {
+    state.bookmarks.unshift({ ...bm, id: uid(), ts: Date.now() });
+    state.bookmarks = state.bookmarks.slice(0, 200);
+    saveLocal();
   }
-  if (provider === "google") {
-    const itemsRaw = (res.data && res.data.items) || [];
-    return { items: itemsRaw.map(it => ({ title: it.title, snippet: it.snippet, url: it.link })) };
+}
+async function getBookmarks() {
+  if (state.storageMode === "server") {
+    const r = await fetch("/bookmarks");
+    const data = await r.json();
+    return data.items || [];
   }
-  if (provider === "bing") {
-    const webPages = res.data && res.data.webPages && res.data.webPages.value || [];
-    return { items: webPages.map(it => ({ title: it.name, snippet: it.snippet, url: it.url })) };
+  return state.bookmarks;
+}
+async function deleteBookmark(id) {
+  if (state.storageMode === "server") {
+    const r = await fetch(`/bookmarks/${id}`, { method: "DELETE" });
+    if (!r.ok) throw new Error("Delete failed");
+  } else {
+    state.bookmarks = state.bookmarks.filter(b => b.id !== id);
+    saveLocal();
   }
-  return { items };
 }
 
-/* Bookmarks */
+/* History helpers (local or server) */
+async function addHistory(h) {
+  if (state.storageMode === "server") {
+    const r = await fetch("/history", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(h) });
+    if (!r.ok) throw new Error("History save failed");
+  } else {
+    state.history.unshift({ ...h, id: uid(), ts: Date.now() });
+    state.history = state.history.slice(0, 200);
+    saveLocal();
+  }
+}
+async function getHistory() {
+  if (state.storageMode === "server") {
+    const r = await fetch("/history");
+    const data = await r.json();
+    return data.items || [];
+  }
+  return state.history;
+}
+async function deleteHistory(id) {
+  if (state.storageMode === "server") {
+    const r = await fetch(`/history/${id}`, { method: "DELETE" });
+    if (!r.ok) throw new Error("Delete failed");
+  } else {
+    state.history = state.history.filter(h => h.id !== id);
+    saveLocal();
+  }
+}
+
+/* Bookmarks view */
 function renderBookmarks(v) {
   v.innerHTML = `
     <div class="card">
@@ -385,33 +358,37 @@ function renderBookmarks(v) {
         <input id="bmUrl" placeholder="https://…" />
         <button class="btn" id="bmAdd">Add</button>
       </div>
+      <p class="note">Storage: ${state.storageMode}</p>
     </div>
   `;
-  const list = el("#bmList");
-  function draw() {
-    list.innerHTML = state.bookmarks.length ? state.bookmarks.map((b, i) => `
-      <div class="item">
-        <a href="${b.url}" target="_blank">${escapeHtml(b.title)}</a>
-        <button class="btn ghost" data-i="${i}">Remove</button>
-      </div>
-    `).join("") : `<div class="note">No bookmarks yet.</div>`;
-    list.querySelectorAll("button[data-i]").forEach(btn => btn.addEventListener("click", () => {
-      state.bookmarks.splice(Number(btn.dataset.i), 1);
-      save(); draw();
-    }));
-  }
-  draw();
-  el("#bmAdd").addEventListener("click", () => {
+  drawBookmarks();
+  el("#bmAdd").addEventListener("click", async () => {
     const t = el("#bmTitle").value.trim();
     const u = el("#bmUrl").value.trim();
     if (!u) return;
-    state.bookmarks.unshift({ title: t || u, url: u });
-    save(); draw();
+    await addBookmark({ title: t || u, url: u });
     el("#bmTitle").value = ""; el("#bmUrl").value = "";
+    drawBookmarks();
   });
 }
+async function drawBookmarks() {
+  const list = el("#bmList");
+  const items = await getBookmarks();
+  list.innerHTML = items.length ? items.map(b => `
+    <div class="item">
+      <a href="${b.url}" target="_blank">${escapeHtml(b.title)}</a>
+      <button class="btn ghost" data-id="${b.id}">Remove</button>
+    </div>
+  `).join("") : `<div class="note">No bookmarks yet.</div>`;
+  list.querySelectorAll("button[data-id]").forEach(btn => btn.addEventListener("click", async () => {
+    await deleteBookmark(btn.dataset.id);
+    drawBookmarks();
+  }));
+}
+// For quick refresh after actions
+function renderBookmarksPanelOnly() { if (state.currentView === "bookmarks") drawBookmarks(); }
 
-/* Settings */
+/* Settings view */
 function renderSettings(v) {
   v.innerHTML = `
     <div class="grid cols-2">
@@ -422,12 +399,15 @@ function renderSettings(v) {
           <option value="google"${state.provider==="google"?" selected":""}>Google</option>
           <option value="bing"${state.provider==="bing"?" selected":""}>Bing</option>
         </select>
-        <p class="note">Proxy endpoint: <span class="kbd">/search?q=&provider=</span></p>
+        <p class="note">Proxy endpoint: /search</p>
       </div>
       <div class="card">
-        <h4>Privacy</h4>
-        <label><input type="checkbox" id="storeHistory"> Store local history</label>
-        <p class="note">History is saved in your browser’s localStorage. No server storage.</p>
+        <h4>Storage mode</h4>
+        <select id="storageMode">
+          <option value="local"${state.storageMode==="local"?" selected":""}>Local (browser)</option>
+          <option value="server"${state.storageMode==="server"?" selected":""}>Server (proxy)</option>
+        </select>
+        <p class="note">Bookmarks and history will use localStorage or the proxy.</p>
       </div>
       <div class="card">
         <h4>Appearance</h4>
@@ -439,19 +419,14 @@ function renderSettings(v) {
       </div>
     </div>
   `;
-  el("#providerSetting").addEventListener("change", e => { state.provider = e.target.value; save(); setStatus("Provider updated"); });
-  el("#storeHistory").checked = !!localStorage.getItem("history");
-  el("#storeHistory").addEventListener("change", e => {
-    if (!e.target.checked) { localStorage.removeItem("history"); state.history = []; }
-    else save();
-  });
-  el("#highContrast").addEventListener("change", e => {
-    document.body.style.filter = e.target.checked ? "contrast(1.2) saturate(1.1)" : "";
-  });
+  el("#providerSetting").addEventListener("change", e => { state.provider = e.target.value; saveLocal(); setStatus("Provider updated"); });
+  el("#storageMode").addEventListener("change", e => { state.storageMode = e.target.value; saveLocal(); setStatus("Storage mode updated"); });
+  el("#highContrast").addEventListener("change", e => { document.body.style.filter = e.target.checked ? "contrast(1.2) saturate(1.1)" : ""; });
   el("#resetBtn").addEventListener("click", () => {
     if (!confirm("Reset bookmarks, history, provider?")) return;
     localStorage.clear();
     state.provider = "duckduckgo";
+    state.storageMode = "local";
     state.bookmarks = []; state.history = [];
     renderView(); setStatus("Reset complete");
   });
@@ -463,7 +438,7 @@ function renderGames(v) {
     <div class="card">
       <h4>Flappy Bird</h4>
       <canvas id="flappy" width="360" height="480" style="background:#0a0e25;border:1px solid var(--border);border-radius:10px"></canvas>
-      <p class="note">Space or click to flap. Simple canvas implementation.</p>
+      <p class="note">Space or click to flap.</p>
     </div>
   `;
   flappyInit(el("#flappy"));
@@ -472,50 +447,35 @@ function flappyInit(canvas) {
   const ctx = canvas.getContext("2d");
   let birdY = 200, vel = 0, pipes = [], score = 0, alive = true;
   function reset() { birdY = 200; vel = 0; pipes = []; score = 0; alive = true; }
-  function pipe() {
-    const gap = 110, top = Math.random() * 240 + 40;
-    pipes.push({ x: canvas.width, top, gap });
-  }
+  function pipe() { const gap = 110, top = Math.random()*240 + 40; pipes.push({ x: canvas.width, top, gap }); }
   function step() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    // gravity
     vel += 0.5; birdY += vel;
-    // bird
     ctx.fillStyle = "#ffd166"; ctx.fillRect(40, birdY, 24, 24);
     if (birdY < 0 || birdY > canvas.height - 24) alive = false;
-    // pipes
     if (!pipes.length || pipes[pipes.length-1].x < canvas.width - 180) pipe();
     ctx.fillStyle = "#59d7ff";
     for (const p of pipes) {
       p.x -= 2.2;
       ctx.fillRect(p.x, 0, 44, p.top);
       ctx.fillRect(p.x, p.top + p.gap, 44, canvas.height - (p.top + p.gap));
-      // collision
       const inX = 40+24 > p.x && 40 < p.x+44;
       const hitTop = birdY < p.top;
       const hitBottom = birdY+24 > p.top + p.gap;
       if (inX && (hitTop || hitBottom)) alive = false;
-      if (p.x+44 === 40) score++;
     }
-    // score
     ctx.fillStyle = "#e6e9ff"; ctx.font = "16px monospace";
     ctx.fillText(`Score: ${score}`, 12, 22);
-    if (!alive) {
-      ctx.fillStyle = "#ff6b6b"; ctx.fillText("Game Over (R to restart)", 12, 42);
-      return;
-    }
+    if (!alive) { ctx.fillStyle = "#ff6b6b"; ctx.fillText("Game Over (R to restart)", 12, 42); return; }
     requestAnimationFrame(step);
   }
-  function flap() { if (!alive) return; vel = -6.8; }
+  function flap() { if (!alive) return; vel = -6.8; score++; }
   canvas.addEventListener("mousedown", flap);
-  window.addEventListener("keydown", (e) => {
-    if (e.code === "Space") flap();
-    if (e.code === "KeyR") { reset(); step(); }
-  });
+  window.addEventListener("keydown", (e) => { if (e.code === "Space") flap(); if (e.code === "KeyR") { reset(); step(); } });
   reset(); step();
 }
 
-/* AI (placeholder) */
+/* AI view – proxied */
 function renderAI(v) {
   v.innerHTML = `
     <div class="card">
@@ -525,37 +485,53 @@ function renderAI(v) {
         <button class="btn primary" id="aiSend">Send</button>
       </div>
       <div class="card" style="margin-top:10px"><div id="aiOut" class="list"></div></div>
-      <p class="note">Wire this to your AI backend. Currently echoes and keeps local history.</p>
+      <p class="note">Proxy: /ai (demo echo)</p>
     </div>
   `;
   const out = el("#aiOut");
-  el("#aiSend").addEventListener("click", () => {
+  el("#aiSend").addEventListener("click", async () => {
     const q = el("#aiPrompt").value.trim(); if (!q) return;
-    const a = `You asked: "${q}". This is a placeholder response.`;
-    out.innerHTML = `<div class="item"><span class="kbd">You</span>: ${escapeHtml(q)}</div>
-                     <div class="item"><span class="kbd">AI</span>: ${escapeHtml(a)}</div>` + out.innerHTML;
-    el("#aiPrompt").value = "";
+    setStatus("Sending to AI…");
+    try {
+      const r = await fetch("/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: q }) });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "AI error");
+      out.innerHTML = `<div class="item"><span class="kbd">You</span>: ${escapeHtml(q)}</div>
+                       <div class="item"><span class="kbd">AI</span>: ${escapeHtml(data.reply || "")}</div>` + out.innerHTML;
+      el("#aiPrompt").value = "";
+    } catch (e) {
+      out.innerHTML = `<div class="item danger">Error: ${escapeHtml(e.message)}</div>` + out.innerHTML;
+    }
   });
 }
 
-/* Chat (local mock) */
+/* Chat view – proxied */
 function renderChat(v) {
   v.innerHTML = `
     <div class="card">
-      <h4>Chat (local)</h4>
+      <h4>Chat (proxied)</h4>
       <div id="chatLog" class="list"></div>
       <div class="row" style="margin-top:10px">
         <input id="chatMsg" placeholder="Type a message…" />
         <button class="btn" id="chatSend">Send</button>
       </div>
-      <p class="note">For real-time chat, connect to a WebSocket backend.</p>
+      <p class="note">Proxy: /chat (demo echo)</p>
     </div>
   `;
   const log = el("#chatLog");
-  el("#chatSend").addEventListener("click", () => {
+  el("#chatSend").addEventListener("click", async () => {
     const m = el("#chatMsg").value.trim(); if (!m) return;
+    setStatus("Sending chat…");
     log.innerHTML += `<div class="item"><span class="kbd">You</span>: ${escapeHtml(m)}</div>`;
-    el("#chatMsg").value = "";
+    try {
+      const r = await fetch("/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: m }) });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Chat error");
+      log.innerHTML += `<div class="item"><span class="kbd">Server</span>: ${escapeHtml(data.reply || "")}</div>`;
+      el("#chatMsg").value = "";
+    } catch (e) {
+      log.innerHTML += `<div class="item danger">Error: ${escapeHtml(e.message)}</div>`;
+    }
   });
 }
 
@@ -581,13 +557,8 @@ function renderDevtools(v) {
   `;
   el("#runJS").addEventListener("click", () => {
     const code = el("#jsInput").value;
-    try {
-      // eslint-disable-next-line no-eval
-      const res = eval(code);
-      el("#jsOut").textContent = String(res);
-    } catch (e) {
-      el("#jsOut").textContent = "Error: " + e.message;
-    }
+    try { /* eslint-disable no-eval */ const res = eval(code); el("#jsOut").textContent = String(res); }
+    catch (e) { el("#jsOut").textContent = "Error: " + e.message; }
   });
   el("#loadHtml").addEventListener("click", () => {
     const doc = el("#sandbox").contentDocument;
@@ -609,7 +580,7 @@ function renderDiscord(v) {
         <input id="discordUrl" placeholder="https://discord.com/invite/yourcode" />
         <button class="btn" id="discordOpen">Open</button>
       </div>
-      <p class="note">Opens in a new tab. You can embed with an iframe, but most features require full page.</p>
+      <p class="note">Opens in a new tab. You can proxy the redirect if you want stealth.</p>
     </div>
   `;
   el("#discordOpen").addEventListener("click", () => {
@@ -624,22 +595,27 @@ function renderAbout(v) {
   v.innerHTML = `
     <div class="card">
       <h4>About</h4>
-      <p>Shadow-like multi-app interface. Tabs, provider-switchable search, bookmarks, games, AI, chat, devtools, fullscreen, about:blank.</p>
-      <p class="note">For the search proxy, implement /search on your server (Node/Express recommended) with DuckDuckGo, Google, Bing routing.</p>
+      <p>Shadow-like multi-app interface. Tabs, provider-switchable search (DuckDuckGo/Google/Bing), proxied AI, proxied chat, optional server bookmarks/history, games, devtools, fullscreen, about:blank.</p>
     </div>
   `;
 }
 
 /* History drawer */
-function renderHistory() {
+async function renderHistory() {
   const list = el("#historyList");
   if (!list) return;
-  list.innerHTML = state.history.length ? state.history.map(h => `
+  const items = await getHistory();
+  list.innerHTML = items.length ? items.map(h => `
     <div class="item">
       <a href="${h.url}" target="_blank">${escapeHtml(h.title)}</a>
       <span class="note">${new Date(h.ts).toLocaleString()}</span>
+      <button class="btn ghost" data-id="${h.id}">Remove</button>
     </div>
   `).join("") : `<div class="note">No history yet.</div>`;
+  list.querySelectorAll("button[data-id]").forEach(btn => btn.addEventListener("click", async () => {
+    await deleteHistory(btn.dataset.id);
+    renderHistory();
+  }));
 }
 
 /* Boot */
